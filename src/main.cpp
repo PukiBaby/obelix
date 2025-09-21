@@ -1,5 +1,10 @@
 #include "main.h"
 
+// ====================================
+// SETUP - GENERAL
+// ====================================
+
+
 // ACTUATORS AND SENSORS SETUP
  
 // We are using "#define" so that we can write the names of objects instead of the port number. 
@@ -7,7 +12,7 @@
 
 // (1) Motors
 
-// (1a) Drivetrain motors
+// (1.1) Drivetrain motors
 #define MOTOR_RB_PORT 1 // RB = right back
 #define MOTOR_RM_PORT 2
 #define MOTOR_RF_PORT 3
@@ -16,7 +21,13 @@
 #define MOTOR_LM_PORT -5
 #define MOTOR_LF_PORT -6
 
-// (1b) Shooting motors
+// (1.2) Shooting motors
+
+// (2) Odometry pods
+#define ODOM_POD_LEFT_PORT 7 //Don't know this yet
+#define ODOM_POD_RIGHT_PORT 8 //Don't know this yet
+#define ODOM_POD_BACK_PORT 9 //Don't know this yet
+
 
 // STICK CONFIGURATION SETUP
 
@@ -30,9 +41,13 @@ enum stickConfigEnum {
 
 enum stickConfigEnum currentStickConfig = ARCADE_DOUBLE_STICK;
 
-// PROS DEFAULT FUNCTIONS
+// ====================================
+// FORWARD DECLARATIONS
+// ====================================
 
-// As of now, I (Grey) don't really know what to do with these.
+// ====================================
+// PROS DEFAULT FUNCTIONS
+// ====================================
 
 void on_center_button() {
 	static bool pressed = false;
@@ -60,27 +75,29 @@ void competition_initialize() {}
 void autonomous() {}
 
 void opcontrol() {
+
+	// (1) Construct all objects
+
+	// (1.1) Construct motors
+	pros::Motor motor_rb (MOTOR_RB_PORT);
+	pros::Motor motor_rm (MOTOR_RM_PORT);
+	pros::Motor motor_rf (MOTOR_RF_PORT);
+
+	// IMPORTANT: reversed the left motors in the "ACTUATORS AND SENSORS SETUP" section
+	pros::Motor motor_lb (MOTOR_LB_PORT);
+	pros::Motor motor_lm (MOTOR_LM_PORT);
+	pros::Motor motor_lf (MOTOR_LF_PORT);
+
+	// (1.2) Construct motor groups
+	pros::Motor_Group right_mg ({motor_rb, motor_rm, motor_rf}); // This uses set notation
+	pros::Motor_Group left_mg ({motor_lb, motor_lm, motor_lf});
+
+	// (1.3) Construct controller
+	pros::Controller master (E_CONTROLLER_MASTER);
+
+	// (2) While loop to execute driving
 	while (true) {
-		// (1) Construct all objects
-
-		// (1a) Construct motors
-		pros::Motor motor_rb (MOTOR_RB_PORT);
-		pros::Motor motor_rm (MOTOR_RM_PORT);
-		pros::Motor motor_rf (MOTOR_RF_PORT);
-
-		// IMPORTANT: reversed the left motors in the "ACTUATORS AND SENSORS SETUP" section
-		pros::Motor motor_lb (MOTOR_LB_PORT);
-		pros::Motor motor_lm (MOTOR_LM_PORT);
-		pros::Motor motor_lf (MOTOR_LF_PORT);
-
-		// (1b) Construct motor groups
-		pros::Motor_Group right_mg ({motor_rb, motor_rm, motor_rf}); // This uses set notation
-		pros::Motor_Group left_mg ({motor_lb, motor_lm, motor_lf});
-
-		// (1c) Construct controller
-		pros::Controller master (E_CONTROLLER_MASTER);
-
-		// (2) Determine how much to move left and right motor groups
+		// (2.1) Determine how much to move left and right motor groups
 
 		int dir; // Forward and backward movement
 		int turn; // Right and left movement
@@ -103,7 +120,7 @@ void opcontrol() {
 				break;
 		}
 
-		// (3) Move the robot
+		// (2.2) Move the robot
 
 		switch (currentStickConfig) {
 			case ARCADE_SINGLE_STICK:
@@ -119,10 +136,14 @@ void opcontrol() {
 				left_mg.move(tank_left);
 		}
 
-		// (4) Delay
+		// (2.3) Delay
 
 		pros::delay(20); 
 		// 20 ms delay to avoid overwhelming the processor
 		// Multiple tasks are actually arranged by the scheduler instead of executed all at once
 	}
 }
+
+// ====================================
+// CUSTOM FUNCTIONS
+// ====================================
