@@ -4,6 +4,7 @@
 // SETUP - GENERAL
 // ====================================
 
+#define PI 3.14159
 
 // ACTUATORS AND SENSORS SETUP
  
@@ -23,11 +24,10 @@
 
 // (1.2) Shooting motors
 
-// (2) Odometry pods
-#define ODOM_POD_LEFT_PORT 7 //Don't know this yet
-#define ODOM_POD_RIGHT_PORT 8 //Don't know this yet
-#define ODOM_POD_BACK_PORT 9 //Don't know this yet
-
+// (2) Odometry stuff
+#define ODOM_POD_V_PORT 7 //Don't know this yet
+#define ODOM_POD_H_PORT 8 //Don't know this yet
+#define IMU_PORT 9 //Don't know this yet
 
 // STICK CONFIGURATION SETUP
 
